@@ -45,23 +45,21 @@ Private Sub Form_Load()
 End Sub
 
 Public Function MACAddressWMI() As String()
-    Dim WMIobj As Object
+Try: On Error GoTo Catch
+    
+    Dim WMIobj As Object: Set WMIobj = GetObject("winmgmts:")
+    WMIobj.ExecQuery "SELECT MACAddress FROM Win32_NetworkAdapter WHERE ((MACAddress Is Not NULL) AND (Manufacturer <> 'Microsoft'))"
+    
+    ReDim sa(0) As String
     Dim MACobj As Object
-    Dim s() As String
-    On Error GoTo ErrOut
-    
-    ReDim s(0)
-    Set WMIobj = GetObject("winmgmts:").ExecQuery("SELECT MACAddress FROM Win32_NetworkAdapter " & _
-              "WHERE ((MACAddress Is Not NULL) AND (Manufacturer <> 'Microsoft'))")
-    
     For Each MACobj In WMIobj
-        ReDim s(UBound(s) + 1)
-        s(UBound(s)) = MACobj.MACAddress
-    Next MACobj
+        ReDim sa(UBound(sa) + 1)
+        sa(UBound(sa)) = MACobj.MACAddress
+    Next
     
-    MACAddressWMI = s
+    MACAddressWMI = sa
     Exit Function
-ErrOut:
+Catch:
     MsgBox "Fehler! WMI ist nicht vorhanden"
 End Function
 

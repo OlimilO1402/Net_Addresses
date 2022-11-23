@@ -55,11 +55,6 @@ Private Type TNetAddress
 End Type
 Private m_ip      As TNetAddress
 Private m_Version As Byte
-'Private m_Name   As String
-'Private m_Server As String
-'Private m_NsluResult As String
-'Private m_PingResult As String
-'Private m_StatResult As String
 Private m_Port       'As Long 'by default it's missing
 
 'IPAddress: 192.168.178.1 'unsinged-Byte1.unsinged-Byte2.unsinged-Byte3.unsinged-Byte4
@@ -69,6 +64,70 @@ Private m_Port       'As Long 'by default it's missing
 'MACAddress:   12:34:56:78:AB:CD
 
 Friend Sub New_(StrLngBytesNewAddress) ', Optional aName As String)
+    Parse StrLngBytesNewAddress
+End Sub
+
+Friend Sub NewV4(ByVal b1 As Byte, ByVal b2 As Byte, ByVal b3 As Byte, ByVal b4 As Byte, Optional Port As Integer)
+    With Me: .ValueB1 = b1: End With
+    With m_ip: .Value1_b12.b2 = b2: .Value2_b34.b1 = b3: .Value2_b34.b2 = b4: End With
+End Sub
+
+Friend Sub NewV6(ByVal i1 As Integer, ByVal i2 As Integer, ByVal i3 As Integer, ByVal i4 As Integer, ByVal i5 As Integer, ByVal i6 As Integer, ByVal i7 As Integer, ByVal i8 As Integer)
+    With Me: .ValueI1 = i1: .ValueI2 = i2: End With
+    With m_ip: .Value3 = i3: .Value4 = i4: .Value5 = i5: .Value6 = i6: .Value7 = i7: .Value8 = i8: End With
+End Sub
+'
+'Friend Sub NewD(ByVal d1 As Integer, ByVal d2 As Integer, ByVal d3 As Integer, ByVal d4 As Integer, Optional d5, Optional d6, Optional d7, Optional d8)
+'    With m_Data: .Data1 = d1: .Data2 = d2: .Data3 = d3: .Data4 = d4: .Data5 = d5: .Data6 = d6: .Data7 = d7: .Data8 = d8: End With
+'End Sub
+
+Friend Sub NewC(other As IPAddress)
+    With other
+        m_Version = .Version
+        If m_Version = 4 Then
+            NewV4 .ValueB1, .ValueB2, .ValueB3, .ValueB4
+        Else
+            NewV6 .ValueI1, .ValueI2, .ValueI3, .ValueI4, .ValueI5, .ValueI6, .ValueI7, .ValueI8
+        End If
+    End With
+    'Debug.Print other.IPToStr
+    'Me.LAddress = other.LAddress
+End Sub
+
+Friend Function Clone() As IPAddress
+    Set Clone = New IPAddress: Clone.NewC Me
+End Function
+
+'Copy to MNew:
+'Public Function IPAddress(ByVal i1 As Integer, ByVal i2 As Integer, ByVal i3 As Integer, ByVal i4 As Integer, Optional i5, Optional i6, Optional i7, Optional i8) As IPAddress
+'    'Set IPAddress = New IPAddress: IPAddress.New_ i1, i2, i3, i4, i5, i6, i7, i8
+'    If IsMissing(i5) Then
+'        Set IPAddress = IPAddressV4(CByte(i1), CByte(i2), CByte(i3), CByte(i4))
+'    Else
+'        Set IPAddress = IPAddressV6(i1, i2, i3, i4, i5, i6, i7, i8)
+'    End If
+'End Function
+'
+'Public Function IPAddressV(StrLngBytesNewAddress) As IPAddress
+'    Set IPAddressV = New IPAddress: IPAddressV.New_ StrLngBytesNewAddress
+'End Function
+'
+'Public Function IPAddressV4(ByVal b1 As Byte, ByVal b2 As Byte, ByVal b3 As Byte, ByVal b4 As Byte, Optional Port As Integer) As IPAddress
+'    Set IPAddressV4 = New IPAddress: IPAddressV4.NewV4 b1, b2, b3, b4, Port
+'End Function
+'
+'Public Function IPAddressV6(ByVal i1 As Integer, ByVal i2 As Integer, ByVal i3 As Integer, ByVal i4 As Integer, ByVal i5 As Integer, ByVal i6 As Integer, ByVal i7 As Integer, ByVal i8 As Integer) As IPAddress
+'    Set IPAddressV6 = New IPAddress: IPAddressV6.NewV6 i1, i2, i3, i4, i5, i6, i7, i8
+'End Function
+
+'Friend Function IPToStr() As String
+'    With m_ip
+'        IPToStr = CStr(.b4) & "." & CStr(.b3) & "." & CStr(.b2) & "." & CStr(.b1)
+'        If Not IsEmpty(m_Port) Then IPToStr = IPToStr & ":" & CStr(CLng(m_Port))
+'    End With
+'End Function
+
+Public Function Parse(StrLngBytesNewAddress) As Boolean
     'StrLngBytesNewAddress: you can either give a string, or a bytearray or a long, or a currency
     'm_Name = aName
     Dim vt As VbVarType: vt = VarType(StrLngBytesNewAddress)
@@ -148,67 +207,7 @@ Friend Sub New_(StrLngBytesNewAddress) ', Optional aName As String)
         Next
         LSet m_ip = ia
     End If
-End Sub
-
-Friend Sub NewV4(ByVal b1 As Byte, ByVal b2 As Byte, ByVal b3 As Byte, ByVal b4 As Byte, Optional Port As Integer)
-    With Me: .ValueB1 = b1: End With
-    With m_ip: .Value1_b12.b2 = b2: .Value2_b34.b1 = b3: .Value2_b34.b2 = b4: End With
-End Sub
-
-Friend Sub NewV6(ByVal i1 As Integer, ByVal i2 As Integer, ByVal i3 As Integer, ByVal i4 As Integer, ByVal i5 As Integer, ByVal i6 As Integer, ByVal i7 As Integer, ByVal i8 As Integer)
-    With Me: .ValueI1 = i1: .ValueI2 = i2: End With
-    With m_ip: .Value3 = i3: .Value4 = i4: .Value5 = i5: .Value6 = i6: .Value7 = i7: .Value8 = i8: End With
-End Sub
-'
-'Friend Sub NewD(ByVal d1 As Integer, ByVal d2 As Integer, ByVal d3 As Integer, ByVal d4 As Integer, Optional d5, Optional d6, Optional d7, Optional d8)
-'    With m_Data: .Data1 = d1: .Data2 = d2: .Data3 = d3: .Data4 = d4: .Data5 = d5: .Data6 = d6: .Data7 = d7: .Data8 = d8: End With
-'End Sub
-
-Friend Sub NewC(other As IPAddress)
-    With other
-        m_Version = .Version
-        If m_Version = 4 Then
-            NewV4 .ValueB1, .ValueB2, .ValueB3, .ValueB4
-        Else
-            NewV6 .ValueI1, .ValueI2, .ValueI3, .ValueI4, .ValueI5, .ValueI6, .ValueI7, .ValueI8
-        End If
-    End With
-    'Debug.Print other.IPToStr
-    'Me.LAddress = other.LAddress
-End Sub
-
-Friend Function Clone() As IPAddress
-    Set Clone = New IPAddress: Clone.NewC Me
 End Function
-
-'Copy to MNew:
-'Public Function IPAddress(ByVal i1 As Integer, ByVal i2 As Integer, ByVal i3 As Integer, ByVal i4 As Integer, Optional i5, Optional i6, Optional i7, Optional i8) As IPAddress
-'    'Set IPAddress = New IPAddress: IPAddress.New_ i1, i2, i3, i4, i5, i6, i7, i8
-'    If IsMissing(i5) Then
-'        Set IPAddress = IPAddressV4(CByte(i1), CByte(i2), CByte(i3), CByte(i4))
-'    Else
-'        Set IPAddress = IPAddressV6(i1, i2, i3, i4, i5, i6, i7, i8)
-'    End If
-'End Function
-'
-'Public Function IPAddressV(StrLngBytesNewAddress) As IPAddress
-'    Set IPAddressV = New IPAddress: IPAddressV.New_ StrLngBytesNewAddress
-'End Function
-'
-'Public Function IPAddressV4(ByVal b1 As Byte, ByVal b2 As Byte, ByVal b3 As Byte, ByVal b4 As Byte, Optional Port As Integer) As IPAddress
-'    Set IPAddressV4 = New IPAddress: IPAddressV4.NewV4 b1, b2, b3, b4, Port
-'End Function
-'
-'Public Function IPAddressV6(ByVal i1 As Integer, ByVal i2 As Integer, ByVal i3 As Integer, ByVal i4 As Integer, ByVal i5 As Integer, ByVal i6 As Integer, ByVal i7 As Integer, ByVal i8 As Integer) As IPAddress
-'    Set IPAddressV6 = New IPAddress: IPAddressV6.NewV6 i1, i2, i3, i4, i5, i6, i7, i8
-'End Function
-
-'Friend Function IPToStr() As String
-'    With m_ip
-'        IPToStr = CStr(.b4) & "." & CStr(.b3) & "." & CStr(.b2) & "." & CStr(.b1)
-'        If Not IsEmpty(m_Port) Then IPToStr = IPToStr & ":" & CStr(CLng(m_Port))
-'    End With
-'End Function
 
 Private Function Hex4(ByVal Value As Integer) As String
     Hex4 = Hex(Value): If Len(Hex4) < 4 Then Hex4 = String(4 - Len(Hex4), "0") & Hex4
@@ -528,98 +527,3 @@ Public Property Let ValueI8(ByVal Value As Integer)
 End Property
 ' ^ ############################## ^ '    Public Property IPAddressV6    ' ^ ############################## ^ '
 
-'
-'Public Sub CallPing(Optional WSShell As Object)
-'    'Dim WScript As Object: Set WScript = CreateObject("WScript")
-'    'Dim WSShell As Object: Set WSShell = CreateObject("WScript.Shell")
-'    If WSShell Is Nothing Then Set WSShell = CreateObject("WScript.Shell")
-'    Dim WSSExec As Object: Set WSSExec = WSShell.Exec("ping -n 1 -w 100 " & Me.IPToStr)
-'    m_PingResult = WSSExec.StdOut.ReadAll
-'    If InStr(m_PingResult, "Empfangen = 1") Then
-'        'm_Name = ParseNameFromPingResult(m_PingResult)
-'        Set WSSExec = WSShell.Exec("ping -a " & Me.IPToStr)
-'        m_StatResult = WSSExec.StdOut.ReadAll
-'        m_Name = ParseNameFromPingResult(m_StatResult)
-'    End If
-'End Sub
-'Function ParseNameFromPingResult(s As String) As String
-'    Dim pos1 As Long: pos1 = InStr(1, s, "Ping wird ausgef")
-'    If pos1 <= 0 Then pos1 = 3
-'    pos1 = pos1 + 16 + 5 + 4
-'    Dim pos2 As Long: pos2 = InStr(pos1, s, "[")
-'    If pos1 < pos2 Then
-'        ParseNameFromPingResult = Trim(Mid$(s, pos1, pos2 - pos1))
-'    End If
-'End Function
-'
-''what about nslookup *IP*
-'Public Sub CallNslookup(Optional WSShell As Object)
-'Try: On Error GoTo Catch
-'    If WSShell Is Nothing Then Set WSShell = CreateObject("WScript.Shell")
-'    Dim WSSExec As Object: Set WSSExec = WSShell.Exec("nslookup " & Me.IPToStr)
-'    m_NsluResult = WSSExec.StdOut.ReadAll
-'    ParseNamesFromNslookupResult m_NsluResult
-'    Exit Sub
-'Catch:
-'    If Err Then
-'        MsgBox Err.Number & " " & Err.Description
-'    End If
-'End Sub
-'
-'Public Sub CallDNS()
-'Try: On Error GoTo Catch
-'    Dim sName As String
-'    Dim rv As Long
-'    rv = MDns.IP2HostName(Me.IPToStr, sName)
-'    m_Name = sName
-'Catch:
-'    If Err Then
-'        MsgBox Err.Number & " " & Err.Description
-'    End If
-'End Sub
-'
-'Sub ParseNamesFromNslookupResult(s As String)
-'    If Len(s) = 0 Then Exit Sub
-'Try: On Error GoTo Catch
-'    Dim sLines() As String: sLines = Split(s, vbCrLf)
-'    Dim sLine    As String
-'    Dim sElems() As String
-'    Dim i As Long
-'    For i = 0 To UBound(sLines)
-'        sLine = Trim$(sLines(i))
-'        If Len(sLine) Then
-'            sElems = Split(sLine, ":")
-'            If sElems(0) = "Name" Then m_Name = Trim$(sElems(1))
-'            If sElems(0) = "Server" Then m_Server = Trim$(sElems(1))
-'            Debug.Print m_Name & " " & m_Server
-'        End If
-'    Next
-'Catch:
-'End Sub
-'Public Function ReadFromStr(s As String) As Boolean
-'    'm_ip As Byte4
-'    'm_Name   As String
-'    'm_Server As String
-'    'm_NsluResult As String
-'    'm_PingResult As String
-'    'm_StatResult As String
-'Try: On Error GoTo Catch
-'    Dim sl() As String: sl = Split(s, vbTab)
-'    Dim ub As Long: ub = UBound(sl)
-'    Dim i As Long
-'    If ub > 0 Then New_ sl(i)
-'    i = i + 1: If ub >= i Then m_Name = sl(i)
-'    i = i + 1: If ub >= i Then m_Server = sl(i)
-'    i = i + 1: If ub >= i Then m_NsluResult = sl(i)
-'    i = i + 1: If ub >= i Then m_PingResult = sl(i)
-'    i = i + 1: If ub >= i Then m_StatResult = sl(i)
-'
-'    Exit Function
-'Catch:
-'
-'End Function
-'
-'Public Function WriteToStr() As String
-'    WriteToStr = Me.IPToStr & vbTab & Me.Name & vbTab & Me.Server & vbTab & Me.NsluResult & vbTab & Me.PingResult & vbTab & Me.StatResult
-'End Function
-'

@@ -181,6 +181,28 @@ Friend Function Clone() As IPAddress
     Set Clone = New IPAddress: Clone.NewC Me
 End Function
 
+'Copy to MNew:
+'Public Function IPAddress(ByVal i1 As Integer, ByVal i2 As Integer, ByVal i3 As Integer, ByVal i4 As Integer, Optional i5, Optional i6, Optional i7, Optional i8) As IPAddress
+'    'Set IPAddress = New IPAddress: IPAddress.New_ i1, i2, i3, i4, i5, i6, i7, i8
+'    If IsMissing(i5) Then
+'        Set IPAddress = IPAddressV4(CByte(i1), CByte(i2), CByte(i3), CByte(i4))
+'    Else
+'        Set IPAddress = IPAddressV6(i1, i2, i3, i4, i5, i6, i7, i8)
+'    End If
+'End Function
+'
+'Public Function IPAddressV(StrLngBytesNewAddress) As IPAddress
+'    Set IPAddressV = New IPAddress: IPAddressV.New_ StrLngBytesNewAddress
+'End Function
+'
+'Public Function IPAddressV4(ByVal b1 As Byte, ByVal b2 As Byte, ByVal b3 As Byte, ByVal b4 As Byte, Optional Port As Integer) As IPAddress
+'    Set IPAddressV4 = New IPAddress: IPAddressV4.NewV4 b1, b2, b3, b4, Port
+'End Function
+'
+'Public Function IPAddressV6(ByVal i1 As Integer, ByVal i2 As Integer, ByVal i3 As Integer, ByVal i4 As Integer, ByVal i5 As Integer, ByVal i6 As Integer, ByVal i7 As Integer, ByVal i8 As Integer) As IPAddress
+'    Set IPAddressV6 = New IPAddress: IPAddressV6.NewV6 i1, i2, i3, i4, i5, i6, i7, i8
+'End Function
+
 'Friend Function IPToStr() As String
 '    With m_ip
 '        IPToStr = CStr(.b4) & "." & CStr(.b3) & "." & CStr(.b2) & "." & CStr(.b1)
@@ -237,9 +259,9 @@ End Function
 ''                Me.StatResult
 'End Function
 
-'Public Property Get Ptr() As LongPtr
-'    Ptr = VarPtr(m_ip)
-'End Property
+Public Property Get Ptr() As LongPtr 'we could also remove the datatype and return only a variant instead, if maybe u do not need MPtr
+    Ptr = VarPtr(m_ip)
+End Property
 Public Property Get Version() As Byte
     Version = m_Version
 End Property

@@ -7,14 +7,5 @@
 [![Follow](https://img.shields.io/github/followers/OlimilO1402.svg?style=social&label=Follow&maxAge=2592000)](https://github.com/OlimilO1402/Net_Addresses/watchers)
 
 Project started in october 2022.  
-This example shows how to implement the IEnumVariant-Interface for supporting the "for each"-language-feature in your own list class, by using a lightweight-object. The contained list-class is just an example of a prototype of a list.  
 
-```vba
-Public Function Foo() As Variant
-	'
-End Function
-```
-
-[Link text Here](https://link-url-here.org) 
-
-![IEnumVarImpl Image](Resources/IEnumVarImpl.png "IEnumVarImpl Image")
+![Net_Addresses Image](Resources/NetAddress.png "NetAddress Image")

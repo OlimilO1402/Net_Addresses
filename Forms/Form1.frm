@@ -221,7 +221,6 @@ Private Sub BtnDoSomeTests_Click()
         DebugWriteLine "IP-V4: " & ip.ToStr & " > " & ip2.ToStr
     End If
     
-    
 End Sub
 
 Sub DebugWriteLine(s As String)
@@ -239,3 +238,30 @@ Private Sub Form_Resize()
     H = Me.ScaleHeight - T
     If W > 0 And H > 0 Then TBTests.Move L, T, W, H
 End Sub
+
+'Frage in AVB-Forum von tmsrtl am 29.03.24 um 18:25:08:
+' "network Adresse einstellen":
+'Ich benutze folgenden Code um die IP usw eizustellen, will es aber nur für einen (!) bestimmten Netwerkadapter tun.
+'Wie muss ich das denn bitte tun !?
+'Nickname: tmsrtl
+'Vorname : thomas
+'Nachname: Roethling
+'E-Mail-Adresse  info@incom.ca
+
+Sub Set_Static()
+     Dim objWMIService:   Set objWMIService = GetObject("winmgmts:\\.\root\cimv2")
+     Dim colNetAdapters: Set colNetAdapters = objWMIService.ExecQuery("Select * from Win32_NetworkAdapterConfiguration " & "where IPEnabled=TRUE")
+     Dim strIPAddress:         strIPAddress = Array("192.168.1.155")
+     Dim strSubnetMask:       strSubnetMask = Array("255.255.255.0")
+     Dim strGateway:             strGateway = Array("192.168.1.1")
+     Dim strGatewaymetric: strGatewaymetric = Array(1)
+     'Dim strDNS: strDNS = Array("10.10.10.10", "10.10.10.11")
+     Dim objNetAdapter
+     For Each objNetAdapter In colNetAdapters
+         Dim errEnable:     errEnable = objNetAdapter.EnableStatic(strIPAddress, strSubnetMask)
+         Dim errGateways: errGateways = objNetAdapter.SetGateways(strGateway, strGatewaymetric)
+         Dim errDNS:           errDNS = objNetAdapter.SetDNSServerSearchOrder(strDNS)
+     Next
+End Sub
+
+

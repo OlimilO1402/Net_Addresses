@@ -33,11 +33,14 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Sub Form_Load()
+Try: On Error GoTo Catch
     Dim sa() As String: sa = MWMI.MACAddresses
-    Dim s
-    For Each s In sa
-        List1.AddItem
+    Dim i As Long, s As String
+    For i = 0 To UBound(sa)
+        List1.AddItem s
     Next
+    Exit Sub
+Catch: 'MsgBox Err.Number & " " & Err.Description
 End Sub
 
 Private Sub Command1_Click()

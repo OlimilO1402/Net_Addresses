@@ -135,10 +135,10 @@ Public Function Parse(StrLngBytesNewAddress) As Boolean
     Select Case vt
     Case vbCurrency
         Dim cc As TCur: cc.Value = CCur(StrLngBytesNewAddress) / CCur(10000): LSet m_ip = cc
-        Exit Sub
+        Exit Function
     Case vbLong
         Dim ll As TLng: ll.Value = CLng(StrLngBytesNewAddress): LSet m_ip = ll
-        Exit Sub
+        Exit Function
     Case (vbArray Or vbByte)
         va = StrLngBytesNewAddress
         u = UBound(va)

@@ -154,7 +154,7 @@ Public Function Parse(StrLngBytesNewAddress) As Boolean
     Case vbString
         va = Split(StrLngBytesNewAddress, ".")
         u = UBound(va)
-        If u = 3 Then
+        If u <= 3 Then
             m_Version = 4
         Else
             va = Split(StrLngBytesNewAddress, ":")
@@ -325,34 +325,34 @@ End Property
 '    If Me.b4 < other.b4 Then Compare = -1: Exit Property
 'End Property
 
-Public Function Compare(other As IPAddress) As Integer
+Public Function compare(other As IPAddress) As Integer
     If m_Version = 4 Then
-        If other.ValueB1 < Me.ValueB1 Then Compare = 1:  Exit Function
-        If Me.ValueB1 < other.ValueB1 Then Compare = -1: Exit Function
-        If other.ValueB2 < Me.ValueB2 Then Compare = 1:  Exit Function
-        If Me.ValueB2 < other.ValueB2 Then Compare = -1: Exit Function
-        If other.ValueB3 < Me.ValueB3 Then Compare = 1:  Exit Function
-        If Me.ValueB3 < other.ValueB3 Then Compare = -1: Exit Function
-        If other.ValueB4 < Me.ValueB4 Then Compare = 1:  Exit Function
-        If Me.ValueB4 < other.ValueB4 Then Compare = -1: Exit Function
+        If other.ValueB1 < Me.ValueB1 Then compare = 1:  Exit Function
+        If Me.ValueB1 < other.ValueB1 Then compare = -1: Exit Function
+        If other.ValueB2 < Me.ValueB2 Then compare = 1:  Exit Function
+        If Me.ValueB2 < other.ValueB2 Then compare = -1: Exit Function
+        If other.ValueB3 < Me.ValueB3 Then compare = 1:  Exit Function
+        If Me.ValueB3 < other.ValueB3 Then compare = -1: Exit Function
+        If other.ValueB4 < Me.ValueB4 Then compare = 1:  Exit Function
+        If Me.ValueB4 < other.ValueB4 Then compare = -1: Exit Function
     Else
-        If other.ValueI1 < Me.ValueI1 Then Compare = 1:  Exit Function
-        If Me.ValueI1 < other.ValueI1 Then Compare = -1: Exit Function
-        If other.ValueI2 < Me.ValueI2 Then Compare = 1:  Exit Function
-        If Me.ValueI2 < other.ValueI2 Then Compare = -1: Exit Function
-        If other.ValueI3 < Me.ValueI3 Then Compare = 1:  Exit Function
-        If Me.ValueI3 < other.ValueI3 Then Compare = -1: Exit Function
-        If other.ValueI4 < Me.ValueI4 Then Compare = 1:  Exit Function
-        If Me.ValueI4 < other.ValueI4 Then Compare = -1: Exit Function
+        If other.ValueI1 < Me.ValueI1 Then compare = 1:  Exit Function
+        If Me.ValueI1 < other.ValueI1 Then compare = -1: Exit Function
+        If other.ValueI2 < Me.ValueI2 Then compare = 1:  Exit Function
+        If Me.ValueI2 < other.ValueI2 Then compare = -1: Exit Function
+        If other.ValueI3 < Me.ValueI3 Then compare = 1:  Exit Function
+        If Me.ValueI3 < other.ValueI3 Then compare = -1: Exit Function
+        If other.ValueI4 < Me.ValueI4 Then compare = 1:  Exit Function
+        If Me.ValueI4 < other.ValueI4 Then compare = -1: Exit Function
         
-        If other.ValueI5 < Me.ValueI5 Then Compare = 1:  Exit Function
-        If Me.ValueI5 < other.ValueI5 Then Compare = -1: Exit Function
-        If other.ValueI6 < Me.ValueI6 Then Compare = 1:  Exit Function
-        If Me.ValueI6 < other.ValueI6 Then Compare = -1: Exit Function
-        If other.ValueI7 < Me.ValueI7 Then Compare = 1:  Exit Function
-        If Me.ValueI7 < other.ValueI7 Then Compare = -1: Exit Function
-        If other.ValueI8 < Me.ValueI8 Then Compare = 1:  Exit Function
-        If Me.ValueI8 < other.ValueI8 Then Compare = -1: Exit Function
+        If other.ValueI5 < Me.ValueI5 Then compare = 1:  Exit Function
+        If Me.ValueI5 < other.ValueI5 Then compare = -1: Exit Function
+        If other.ValueI6 < Me.ValueI6 Then compare = 1:  Exit Function
+        If Me.ValueI6 < other.ValueI6 Then compare = -1: Exit Function
+        If other.ValueI7 < Me.ValueI7 Then compare = 1:  Exit Function
+        If Me.ValueI7 < other.ValueI7 Then compare = -1: Exit Function
+        If other.ValueI8 < Me.ValueI8 Then compare = 1:  Exit Function
+        If Me.ValueI8 < other.ValueI8 Then compare = -1: Exit Function
     End If
 End Function
 

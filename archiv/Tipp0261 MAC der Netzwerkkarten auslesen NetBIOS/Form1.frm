@@ -142,21 +142,21 @@ Private Sub Command1_Click()
     'List1.Clear
     
     'Alle Adapter auslesen
-    Dim numAdapter As Long: numAdapter = modNetBios.NB_EnumLanAdapter(bLanAdapter)
+    Dim numAdapter As Long: numAdapter = MNetBios.EnumLanAdapter(bLanAdapter)
     
     'wurde mindestens ein aktiver Adapter gefunden
     If numAdapter > 0 Then
         'Für jeden Adapter die MAC-Adresse auslesen
         For i = 1 To numAdapter
             'diesen Adapter initalisieren
-            Call modNetBios.NB_ResetAdapter(bLanAdapter(i), 20, 30)
+            MNetBios.ResetAdapter bLanAdapter(i), 20, 30
             
             If optThisComputer.Value = True Then
                 ' MAC-Adresse dieses Adapters auslesen
-                List1.AddItem modNetBios.NB_GetMACAddress(bLanAdapter(i))
+                List1.AddItem MNetBios.GetMACAddress(bLanAdapter(i))
             Else
                 ' Probieren die MAC-Adresse über diesen Adapter zu ermitteln
-                macaddr = modNetBios.NB_GetMACAddress(bLanAdapter(i), txtComputername.Text)
+                macaddr = MNetBios.GetMACAddress(bLanAdapter(i), txtComputername.Text)
                 ' Wenn eine MAC-Adresse über diesen Adapter ermittelt wurde,
                 ' dann die MAC-Adresse anzeigen
                 If Len(macaddr) > 0 Then List1.AddItem macaddr
@@ -168,3 +168,4 @@ Private Sub Command1_Click()
     
     Me.MousePointer = vbDefault
 End Sub
+

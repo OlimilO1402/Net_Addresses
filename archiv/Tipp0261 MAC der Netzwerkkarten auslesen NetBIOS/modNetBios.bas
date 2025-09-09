@@ -1,4 +1,4 @@
-Attribute VB_Name = "modNetBios"
+Attribute VB_Name = "MNetBios"
 'Modul: modNetBios
 Option Explicit
 
@@ -8,54 +8,59 @@ Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (hpvDest As 
 
 Private Declare Sub CopyMemory_ByRef Lib "kernel32" Alias "RtlMoveMemory" (hpvDest As Any, hpvSource As Any, ByVal cbCopy As Long)
 
+Private Const NCBADDNAME   As Byte = &H30
+Private Const NCBDELNAME   As Byte = &H31
+Private Const NCBRESET     As Byte = &H32
+Private Const NCBASTAT     As Byte = &H33
+Private Const NCBADDGRNAME As Byte = &H36
 Private Const NCBENUM      As Byte = &H37
 Private Const NCBFINDNAME  As Byte = &H78
-Private Const NCBDELNAME   As Byte = &H31
-Private Const NCBADDGRNAME As Byte = &H36
-Private Const NCBADDNAME   As Byte = &H30
-Private Const NCBASTAT     As Byte = &H33
 Private Const NCBNAMSZ     As Byte = 16
-Private Const NCBRESET     As Byte = &H32
+
+Public Const NRC_GOODRET     As Long = &H0&
+Public Const NRC_BUFLEN      As Long = &H1&
+Public Const NRC_ILLCMD      As Long = &H3&
+
+Public Const NRC_CMDTMO      As Long = &H5&
+Public Const NRC_INCOMP      As Long = &H6&
+Public Const NRC_BADDR       As Long = &H7&
+Public Const NRC_SNUMOUT     As Long = &H8&
+Public Const NRC_NORES       As Long = &H9&
+
+Public Const NRC_SCLOSED     As Long = &HA&
+Public Const NRC_CMDCAN      As Long = &HB&
+Public Const NRC_DUPNAME     As Long = &HD&
+Public Const NRC_NAMTFUL     As Long = &HE&
 
 Public Const NRC_ACTSES      As Long = &HF&
-Public Const NRC_BADDR       As Long = &H7
-Public Const NRC_BRIDGE      As Long = &H23
-Public Const NRC_BUFLEN      As Long = &H1
-Public Const NRC_CANCEL      As Long = &H26
-Public Const NRC_CANOCCR     As Long = &H24
-Public Const NRC_CMDCAN      As Long = &HB
-Public Const NRC_CMDTMO      As Long = &H5
-Public Const NRC_DUPENV      As Long = &H30
-Public Const NRC_DUPNAME     As Long = &HD
-Public Const NRC_ENVNOTDEF   As Long = &H34
-Public Const NRC_GOODRET     As Long = &H0
-Public Const NRC_IFBUSY      As Long = &H21
-Public Const NRC_ILLCMD      As Long = &H3
+
+Public Const NRC_LOCTFUL     As Long = &H11
+Public Const NRC_REMTFUL     As Long = &H12
 Public Const NRC_ILLNN       As Long = &H13
-Public Const NRC_INCOMP      As Long = &H6
+Public Const NRC_NOCALL      As Long = &H14
+Public Const NRC_NOWILD      As Long = &H15
 Public Const NRC_INUSE       As Long = &H16
+Public Const NRC_NAMERR      As Long = &H17
+Public Const NRC_SABORT      As Long = &H18
+Public Const NRC_NAMCONF     As Long = &H19
+
+Public Const NRC_IFBUSY      As Long = &H21
+Public Const NRC_TOOMANY     As Long = &H22
+Public Const NRC_BRIDGE      As Long = &H23
+Public Const NRC_CANOCCR     As Long = &H24
+Public Const NRC_CANCEL      As Long = &H26
+Public Const NRC_DUPENV      As Long = &H30
+Public Const NRC_ENVNOTDEF   As Long = &H34
+Public Const NRC_OSRESNOTAV  As Long = &H35
+Public Const NRC_MAXAPPS     As Long = &H36
+Public Const NRC_NOSAPS      As Long = &H37
+Public Const NRC_NORESOURCES As Long = &H38
 Public Const NRC_INVADDRESS  As Long = &H39
+Public Const NRC_SYSTEM      As Long = &H40
 Public Const NRC_INVDDID     As Long = &H3B
 Public Const NRC_LOCKFAIL    As Long = &H3C
-Public Const NRC_LOCTFUL     As Long = &H11
-Public Const NRC_MAXAPPS     As Long = &H36
-Public Const NRC_NAMCONF     As Long = &H19
-Public Const NRC_NAMERR      As Long = &H17
-Public Const NRC_NAMTFUL     As Long = &HE
-Public Const NRC_NOCALL      As Long = &H14
-Public Const NRC_NORES       As Long = &H9
-Public Const NRC_NORESOURCES As Long = &H38
-Public Const NRC_NOSAPS      As Long = &H37
-Public Const NRC_NOWILD      As Long = &H15
 Public Const NRC_OPENERR     As Long = &H3F
-Public Const NRC_OSRESNOTAV  As Long = &H35
 Public Const NRC_PENDING     As Long = &HFF&
-Public Const NRC_REMTFUL     As Long = &H12
-Public Const NRC_SABORT      As Long = &H18
-Public Const NRC_SCLOSED     As Long = &HA
-Public Const NRC_SNUMOUT     As Long = &H8
-Public Const NRC_SYSTEM      As Long = &H40
-Public Const NRC_TOOMANY     As Long = &H22
 
 Private Type NCB
     ncb_Command    As Byte
@@ -64,8 +69,8 @@ Private Type NCB
     ncb_Num        As Byte
     ncb_pBuffer    As Long
     ncb_Length     As Integer
-    ncb_CallName   As String * NCBNAMSZ
-    ncb_Name       As String * NCBNAMSZ
+    ncb_CallName   As String * NCBNAMSZ '16
+    ncb_Name       As String * NCBNAMSZ '16
     ncb_RTO        As Byte
     ncb_STO        As Byte
     ncb_Post       As Long
@@ -121,7 +126,7 @@ Private Type ENUM_LANA
     bLana(300) As Byte
 End Type
 
-Public Function NB_EnumLanAdapter(bLanArray() As Byte) As Long
+Public Function EnumLanAdapter(bLanArray() As Byte) As Long
     Dim bRetEnum As ENUM_LANA
     Dim myNcb As NCB
     With myNcb
@@ -133,7 +138,7 @@ Public Function NB_EnumLanAdapter(bLanArray() As Byte) As Long
     If Netbios(myNcb) = NRC_GOODRET Then
         'Anzahl der aktiven Netzwerkkarten auslesen
         If bRetEnum.bCount Then
-            NB_EnumLanAdapter = CLng(bRetEnum.bCount)
+            EnumLanAdapter = CLng(bRetEnum.bCount)
             'Nur auslesen, wenn mindestens 1 Netzwerkkarte gefunden wurde
             'Return Array anpassen
             ReDim bLanArray(1 To bRetEnum.bCount)
@@ -143,7 +148,7 @@ Public Function NB_EnumLanAdapter(bLanArray() As Byte) As Long
     End If
 End Function
 
-Public Function NB_ResetAdapter(lLanNumber As Byte, lSessions As Long, lMaxNames As Long) As Long
+Public Function ResetAdapter(lLanNumber As Byte, lSessions As Long, lMaxNames As Long) As Long
     Dim myNcb As NCB
     With myNcb
         .ncb_Lana_Num = lLanNumber                  'Welche Netzwerkkarte soll resettet werden
@@ -151,11 +156,11 @@ Public Function NB_ResetAdapter(lLanNumber As Byte, lSessions As Long, lMaxNames
         .ncb_LSN = 0
         Mid$(.ncb_CallName, 1, 1) = Chr$(lSessions) 'Maximale Anzahl an Sessions seztzen
         Mid$(.ncb_CallName, 3, 1) = Chr$(lMaxNames) 'Maximale Anzahl an Namen setzen
-        If Netbios(myNcb) = NRC_GOODRET Then NB_ResetAdapter = 1 'Netzwerkkarte resetten
+        If Netbios(myNcb) = NRC_GOODRET Then ResetAdapter = 1 'Netzwerkkarte resetten
     End With
 End Function
 
-Public Function NB_GetMACAddress(ByVal lLanNumber As Byte, Optional Server As String = "*") As String
+Public Function GetMACAddress(ByVal lLanNumber As Byte, Optional Server As String = "*") As String
     'Dim bRet    As Byte
     Dim myNcb   As NCB
     Dim myASTAT As ASTAT
@@ -173,7 +178,7 @@ Public Function NB_GetMACAddress(ByVal lLanNumber As Byte, Optional Server As St
     If ret = NRC_GOODRET Then
         With myASTAT.adapt
             'Daten in die neue
-            NB_GetMACAddress = Hex2(.adapter_address(0)) & "-" & Hex2(.adapter_address(1)) & "-" & Hex2(.adapter_address(2)) & "-" & Hex2(.adapter_address(3)) & "-" & Hex2(.adapter_address(4)) & "-" & Hex2(.adapter_address(5))
+            GetMACAddress = Hex2(.adapter_address(0)) & "-" & Hex2(.adapter_address(1)) & "-" & Hex2(.adapter_address(2)) & "-" & Hex2(.adapter_address(3)) & "-" & Hex2(.adapter_address(4)) & "-" & Hex2(.adapter_address(5))
         End With
     End If
 End Function

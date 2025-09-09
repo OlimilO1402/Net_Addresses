@@ -43,6 +43,18 @@ Friend Sub New_(ByVal b1 As Byte, ByVal b2 As Byte, ByVal b3 As Byte, ByVal b4 A
     m_sep = sep
 End Sub
 
+Friend Sub NewC(other As MACAddress)
+    With other: Me.New_ .Value1, .Value2, .Value3, .Value4, .Value5, .Value6: End With
+End Sub
+
+Friend Function Clone() As MACAddress
+    Set Clone = New MACAddress: Clone.NewC Me
+End Function
+
+Friend Property Get Ptr() As LongPtr
+    Ptr = VarPtr(m_mac)
+End Property
+
 Friend Function ToStr() As String
     Dim sep As String: sep = m_sep
     With m_mac

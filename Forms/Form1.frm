@@ -1,6 +1,6 @@
 VERSION 5.00
-Begin VB.Form Form1 
-   Caption         =   "Form1"
+Begin VB.Form FMain 
+   Caption         =   "Net Addresses IP-V4, -V6, MAC"
    ClientHeight    =   7830
    ClientLeft      =   120
    ClientTop       =   465
@@ -14,6 +14,7 @@ Begin VB.Form Form1
       Italic          =   0   'False
       Strikethrough   =   0   'False
    EndProperty
+   Icon            =   "Form1.frx":0000
    LinkTopic       =   "Form1"
    ScaleHeight     =   7830
    ScaleWidth      =   10095
@@ -119,12 +120,24 @@ Begin VB.Form Form1
       Width           =   2415
    End
 End
-Attribute VB_Name = "Form1"
+Attribute VB_Name = "FMain"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
+
+Private Sub Form_Load()
+    Me.Caption = Me.Caption & " v" & App.Major & "." & App.Minor & "." & App.Revision
+End Sub
+
+Private Sub Form_Resize()
+    Dim L As Single, t As Single, W As Single, H As Single
+    t = TBTests.Top
+    W = Me.ScaleWidth
+    H = Me.ScaleHeight - t
+    If W > 0 And H > 0 Then TBTests.Move L, t, W, H
+End Sub
 
 Private Sub BtnCreateIPAddressV4_Click()
     
@@ -222,15 +235,15 @@ Private Sub BtnDoSomeTests_Click()
     
     Set ip = MNew.IPAddress(192, 168, 178, 100)
     Dim ip2 As IPAddress: Set ip2 = ip.Clone
-    If ip.Compare(ip2) = 0 Then
+    If ip.compare(ip2) = 0 Then
         DebugWriteLine "IP-V4: " & ip.ToStr & " = " & ip2.ToStr
     End If
     ip2.OneUp
-    If ip.Compare(ip2) < 0 Then
+    If ip.compare(ip2) < 0 Then
         DebugWriteLine "IP-V4: " & ip.ToStr & " < " & ip2.ToStr
     End If
     ip.OneUp: ip.OneUp
-    If ip.Compare(ip2) > 0 Then
+    If ip.compare(ip2) > 0 Then
         DebugWriteLine "IP-V4: " & ip.ToStr & " > " & ip2.ToStr
     End If
     
@@ -241,15 +254,7 @@ Sub DebugWriteLine(s As String)
 End Sub
 
 Private Sub BtnTestMACAddress_Click()
-    Form2.Show
-End Sub
-
-Private Sub Form_Resize()
-    Dim L As Single, T As Single, W As Single, H As Single
-    T = TBTests.Top
-    W = Me.ScaleWidth
-    H = Me.ScaleHeight - T
-    If W > 0 And H > 0 Then TBTests.Move L, T, W, H
+    FMACAddr.Show
 End Sub
 
 Sub Set_Static()
@@ -259,6 +264,7 @@ Sub Set_Static()
      Dim strSubnetMask:       strSubnetMask = Array("255.255.255.0")
      Dim strGateway:             strGateway = Array("192.168.1.1")
      Dim strGatewaymetric: strGatewaymetric = Array(1)
+     Dim strDNS
      Dim objNetAdapter
      For Each objNetAdapter In colNetAdapters
          Dim errEnable:     errEnable = objNetAdapter.EnableStatic(strIPAddress, strSubnetMask)

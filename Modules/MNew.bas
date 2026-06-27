@@ -37,6 +37,6 @@ Public Function MACAddress(ByVal b1 As Byte, ByVal b2 As Byte, ByVal b3 As Byte,
 End Function
 
 Public Function MACAddressA(bytes05() As Byte, Optional sep As String = "-") As MACAddress
-    Set MACAddress = New MACAddress: MACAddress.New_ bytes(0), bytes(1), bytes(2), bytes(3), bytes(4), bytes(5), sep
+    Set MACAddressA = New MACAddress: MACAddressA.New_ bytes05(0), bytes05(1), bytes05(2), bytes05(3), bytes05(4), bytes05(5), sep
 End Function
 

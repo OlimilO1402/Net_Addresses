@@ -7,7 +7,7 @@ Private Declare Function Netbios Lib "netapi32" (pncb As NCB) As Byte
 
 'Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (hpvDest As Any, ByVal hpvSource As Long, ByVal cbCopy As Long)
 'Private Declare Sub CopyMemory_ByRef Lib "kernel32" Alias "RtlMoveMemory" (hpvDest As Any, hpvSource As Any, ByVal cbCopy As Long)
-Private Declare Sub RtlMoveMemory Lib "kernel32" (pDst As Any, pSrc As Any, ByVal bytlen As Long)
+'Private Declare Sub RtlMoveMemory Lib "kernel32" (pDst As Any, pSrc As Any, ByVal bytlen As Long)
 
 
 Private Const NCBCALL        As Long = &H10& 'Opens a session with another name.
@@ -93,6 +93,36 @@ Public Const NRC_OPENERR     As Long = &H3F&
 Public Const NRC_SYSTEM      As Long = &H40&
 Public Const NRC_PENDING     As Long = &HFF&
 
+Private Type ADAPTER_STATUS
+    adapter_address(0 To 5) As Byte 'MAC-Adress
+    rev_major          As Byte
+    reserved0          As Byte
+    adapter_type       As Byte
+    rev_minor          As Byte
+    duration           As Integer
+    frmr_recv          As Integer
+    frmr_xmit          As Integer
+    iframe_recv_err    As Integer
+    xmit_aborts        As Integer
+    xmit_success       As Long
+    recv_success       As Long
+    iframe_xmit_err    As Integer
+    recv_buff_unavail  As Integer
+    t1_timeouts        As Integer
+    ti_timeouts        As Integer
+    Reserved1          As Long
+    free_ncbs          As Integer
+    max_cfg_ncbs       As Integer
+    max_ncbs           As Integer
+    xmit_buf_unavail   As Integer
+    max_dgram_size     As Integer
+    pending_sess       As Integer
+    max_cfg_sess       As Integer
+    max_sess           As Integer
+    max_sess_pkt_size  As Integer
+    name_count         As Integer
+End Type
+
 'typedef struct _NCB {
 '  UCHAR  ncb_command;
 '  UCHAR  ncb_retcode;
@@ -120,7 +150,7 @@ Private Type NCB
     ncb_RetCode    As Byte
     ncb_LSN        As Byte
     ncb_Num        As Byte
-    ncb_Buffer     As LongPtr
+    ncb_pBuffer    As LongPtr
     ncb_Length     As Integer
     ncb_CallName(0 To NCBNAMSZ - 1) As Byte 'String * NCBNAMSZ '16
     ncb_Name(0 To NCBNAMSZ - 1)     As Byte 'String * NCBNAMSZ '16
@@ -132,6 +162,17 @@ Private Type NCB
     ncb_Reserve(0 To 9) As Byte
     'ncb_Reserve(0 to 17) As Byte
     ncb_hEvent     As LongPtr
+End Type
+
+Private Type NAME_BUFFER
+    NName(0 To 15) As Byte 'String * NCBNAMSZ
+    name_num   As Integer
+    name_flags As Integer
+End Type
+
+Private Type ASTAT
+    adapt        As ADAPTER_STATUS
+    NameBuff(30) As NAME_BUFFER
 End Type
 
 Private Type ENUM_LANA
@@ -159,9 +200,9 @@ Public Function EnumLanAdapter() As Long
         EnumLanAdapter = CLng(m_RetEnum.bCount)
         'Nur auslesen, wenn mindestens 1 Netzwerkkarte gefunden wurde
         'Return Array anpassen
-        ReDim m_bLanArray(1 To bRetEnum.bCount)
+        ReDim m_bLanArray(1 To m_RetEnum.bCount)
         'Daten ins Array kopieren
-        CopyMemory_ByRef m_bLanArray(1), bRetEnum.bLana(0), bRetEnum.bCount
+        RtlMoveMemory m_bLanArray(1), m_RetEnum.bLana(0), m_RetEnum.bCount
     End If
 End Function
 
@@ -171,8 +212,10 @@ Public Function ResetAdapter(lLanNumber As Byte, lSessions As Long, lMaxNames As
         .ncb_Lana_Num = lLanNumber                  'Welche Netzwerkkarte soll resettet werden
         .ncb_Command = NCBRESET                     'NetBios Command setzen
         .ncb_LSN = 0
-        Mid$(.ncb_CallName, 1, 1) = Chr$(lSessions) 'Maximale Anzahl an Sessions seztzen
-        Mid$(.ncb_CallName, 3, 1) = Chr$(lMaxNames) 'Maximale Anzahl an Namen setzen
+        'Mid$(.ncb_CallName, 1, 1) = Chr$(lSessions) 'Maximale Anzahl an Sessions seztzen
+        .ncb_CallName(0) = Asc(Chr$(lSessions))
+        'Mid$(.ncb_CallName, 3, 1) = Chr$(lMaxNames) 'Maximale Anzahl an Namen setzen
+        .ncb_CallName(2) = Asc(Chr$(lMaxNames))
         If Netbios(myNcb) = NRC_GOODRET Then ResetAdapter = 1 'Netzwerkkarte resetten
     End With
 End Function
@@ -184,8 +227,9 @@ Public Function GetMACAddress(ByVal lLanNumber As Byte, Optional Server As Strin
     With myNcb
         .ncb_Command = NCBASTAT        'NetBios Command setzen
         .ncb_Lana_Num = lLanNumber     'Welche Netzwerkkarte soll benutzt werden
-        .ncb_CallName = Server         'Server setzen, dies kann auch ein RemoteHost sein!
-        .ncb_Length = Len(myASTAT)     'Größe des Speichers setzen
+        '.ncb_CallName = Server         'Server setzen, dies kann auch ein RemoteHost sein!
+        RtlMoveMemory .ncb_CallName(0), ByVal StrPtr(Server), Max(LenB(Server), 16)
+        .ncb_Length = LenB(myASTAT)     'Größe des Speichers setzen
         .ncb_pBuffer = VarPtr(myASTAT) 'pASTAT 'Buffer eintragen
     End With
     
@@ -204,3 +248,6 @@ Private Function Hex2(ByVal Value As Byte) As String
     Hex2 = Hex(Value): If Len(Hex2) = 1 Then Hex2 = "0" & Hex2
 End Function
 
+Private Function Max(V1, V2)
+    If V1 > V2 Then Max = V1 Else Max = V2
+End Function

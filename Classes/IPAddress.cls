@@ -154,7 +154,7 @@ Public Function Parse(StrLngBytesNewAddress) As Boolean
     Case vbString
         va = Split(StrLngBytesNewAddress, ".")
         u = UBound(va)
-        If u <= 3 Then
+        If 0 < u And u <= 3 Then
             m_Version = 4
         Else
             va = Split(StrLngBytesNewAddress, ":")

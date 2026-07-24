@@ -1,6 +1,8 @@
 Attribute VB_Name = "MNetBios"
 'Modul: modNetBios
 Option Explicit
+'    VB 5/6-Tipp 0261: MAC der Netzwerkkarte(n) auslesen
+'https://www.activevb.de/tipps/vb6tipps/tipp0261.html
 
 'https://learn.microsoft.com/en-us/windows/win32/api/nb30/nf-nb30-netbios
 Private Declare Function Netbios Lib "netapi32" (pncb As NCB) As Byte
@@ -46,10 +48,10 @@ Private Const NCBNAMSZ       As Long = 16
 
 
 Public Const NRC_GOODRET     As Long = &H0&
-'2
 Public Const NRC_BUFLEN      As Long = &H1&
+'2
 Public Const NRC_ILLCMD      As Long = &H3&
-
+'4
 Public Const NRC_CMDTMO      As Long = &H5&
 Public Const NRC_INCOMP      As Long = &H6&
 Public Const NRC_BADDR       As Long = &H7&
@@ -71,24 +73,26 @@ Public Const NRC_INUSE       As Long = &H16&
 Public Const NRC_NAMERR      As Long = &H17&
 Public Const NRC_SABORT      As Long = &H18&
 Public Const NRC_NAMCONF     As Long = &H19&
-'20
+'&H20
 Public Const NRC_IFBUSY      As Long = &H21&
 Public Const NRC_TOOMANY     As Long = &H22&
 Public Const NRC_BRIDGE      As Long = &H23&
 Public Const NRC_CANOCCR     As Long = &H24&
-'25
+'&H25
 Public Const NRC_CANCEL      As Long = &H26&
-'27, 28, 29
+'&H27, &H28, &H29
 Public Const NRC_DUPENV      As Long = &H30&
-'31, 32, 33
+'&H31, &H32, &H33
 Public Const NRC_ENVNOTDEF   As Long = &H34&
 Public Const NRC_OSRESNOTAV  As Long = &H35&
 Public Const NRC_MAXAPPS     As Long = &H36&
 Public Const NRC_NOSAPS      As Long = &H37&
 Public Const NRC_NORESOURCES As Long = &H38&
 Public Const NRC_INVADDRESS  As Long = &H39&
+'&H3A
 Public Const NRC_INVDDID     As Long = &H3B&
 Public Const NRC_LOCKFAIL    As Long = &H3C&
+'&H3D, &H3E
 Public Const NRC_OPENERR     As Long = &H3F&
 Public Const NRC_SYSTEM      As Long = &H40&
 Public Const NRC_PENDING     As Long = &HFF&
@@ -176,23 +180,26 @@ Private Type ASTAT
 End Type
 
 Private Type ENUM_LANA
-    bCount     As Byte
-    bLana(300) As Byte
+    bCount          As Byte
+    bLana(0 To 300) As Byte
 End Type
+
 Private m_RetEnum As ENUM_LANA
 Private m_NCB     As NCB
+Private m_ASTAT   As ASTAT
 Private m_bLanArray() As Byte
 
 Public Function EnumLanAdapter() As Long
     With m_NCB
         .ncb_Command = NCBENUM           'NetBios Command Enum setzen
         .ncb_pBuffer = VarPtr(m_RetEnum)   'Bufferpointer eintragen
-        .ncb_Length = Len(m_RetEnum)       'Größe des Buffers angeben
+        .ncb_Length = Len(m_RetEnum)       'Größe des Buffers angeben 302
     End With
     'Alle aktiven Netzwerkkarten enumerieren
     Dim ret As Long: ret = Netbios(m_NCB)
     If ret <> NRC_GOODRET Then
         'Fehler ermitteln
+        MsgBox ReturnToStr(ret)
         Exit Function
     End If
     'Anzahl der aktiven Netzwerkkarten auslesen
@@ -206,7 +213,7 @@ Public Function EnumLanAdapter() As Long
     End If
 End Function
 
-Public Function ResetAdapter(lLanNumber As Byte, lSessions As Long, lMaxNames As Long) As Long
+Public Function ResetAdapter(ByVal lLanNumber As Byte, ByVal lSessions As Long, ByVal lMaxNames As Long) As Long
     Dim myNcb As NCB
     With myNcb
         .ncb_Lana_Num = lLanNumber                  'Welche Netzwerkkarte soll resettet werden
@@ -216,28 +223,35 @@ Public Function ResetAdapter(lLanNumber As Byte, lSessions As Long, lMaxNames As
         .ncb_CallName(0) = Asc(Chr$(lSessions))
         'Mid$(.ncb_CallName, 3, 1) = Chr$(lMaxNames) 'Maximale Anzahl an Namen setzen
         .ncb_CallName(2) = Asc(Chr$(lMaxNames))
-        If Netbios(myNcb) = NRC_GOODRET Then ResetAdapter = 1 'Netzwerkkarte resetten
+        Dim ret As Long: ret = Netbios(myNcb)
+        If ret <> NRC_GOODRET Then
+            MsgBox ReturnToStr(ret)
+        Else
+            ResetAdapter = 1 'Netzwerkkarte resetten
+        End If
     End With
 End Function
 
 Public Function GetMACAddress(ByVal lLanNumber As Byte, Optional Server As String = "*") As String
     'Dim bRet    As Byte
-    Dim myNcb   As NCB
-    Dim myASTAT As ASTAT
-    With myNcb
+    'Dim myNcb   As NCB
+    'Dim myASTAT As ASTAT
+    Dim la As LANAdapter: Set la = New LANAdapter
+    With m_NCB
         .ncb_Command = NCBASTAT        'NetBios Command setzen
         .ncb_Lana_Num = lLanNumber     'Welche Netzwerkkarte soll benutzt werden
         '.ncb_CallName = Server         'Server setzen, dies kann auch ein RemoteHost sein!
         RtlMoveMemory .ncb_CallName(0), ByVal StrPtr(Server), Max(LenB(Server), 16)
-        .ncb_Length = LenB(myASTAT)     'Größe des Speichers setzen
-        .ncb_pBuffer = VarPtr(myASTAT) 'pASTAT 'Buffer eintragen
+        .ncb_Length = LenB(m_ASTAT)     'Größe des Speichers setzen
+        .ncb_pBuffer = la.Ptr 'VarPtr(myASTAT) 'pASTAT 'Buffer eintragen
     End With
     
     'Karte auslesen
-    Dim ret As Long
-    ret = Netbios(myNcb)
-    If ret = NRC_GOODRET Then
-        With myASTAT.adapt
+    Dim ret As Long: ret = Netbios(m_NCB)
+    If ret <> NRC_GOODRET Then
+        MsgBox ReturnToStr(ret)
+    Else
+        With m_ASTAT.adapt
             'Daten in die neue
             GetMACAddress = Hex2(.adapter_address(0)) & "-" & Hex2(.adapter_address(1)) & "-" & Hex2(.adapter_address(2)) & "-" & Hex2(.adapter_address(3)) & "-" & Hex2(.adapter_address(4)) & "-" & Hex2(.adapter_address(5))
         End With
@@ -250,4 +264,58 @@ End Function
 
 Private Function Max(V1, V2)
     If V1 > V2 Then Max = V1 Else Max = V2
+End Function
+
+Private Function ReturnToStr(ByVal RetValue As Long) As String
+    Dim s As String
+    Select Case RetValue
+    Case NRC_GOODRET:     s = "GOODRET" '0
+'2
+    Case NRC_BUFLEN:      s = "BUFLEN"
+    Case NRC_ILLCMD:      s = "ILLCMD"
+
+    Case NRC_CMDTMO:      s = "CMDTMO"
+    Case NRC_INCOMP:      s = "INCOMP"
+    Case NRC_BADDR:       s = "BADDR"
+    Case NRC_SNUMOUT:     s = "SNUMOUT"
+    Case NRC_NORES:       s = "NORES"
+    Case NRC_SCLOSED:     s = "SCLOSED"
+    Case NRC_CMDCAN:      s = "CMDCAN"
+'C
+    Case NRC_DUPNAME:     s = "DUPNAME"
+    Case NRC_NAMTFUL:     s = "NAMTFUL"
+    Case NRC_ACTSES:      s = "ACTSES"
+'10
+    Case NRC_LOCTFUL:     s = "LOCTFUL"
+    Case NRC_REMTFUL:     s = "REMTFUL"
+    Case NRC_ILLNN:       s = "ILLNN"
+    Case NRC_NOCALL:      s = "NOCALL"
+    Case NRC_NOWILD:      s = "NOWILD"
+    Case NRC_INUSE:       s = "INUSE"
+    Case NRC_NAMERR:      s = "NAMERR"
+    Case NRC_SABORT:      s = "SABORT"
+    Case NRC_NAMCONF:     s = "NAMCONF"
+'20
+    Case NRC_IFBUSY:      s = "IFBUSY"
+    Case NRC_TOOMANY:     s = "TOOMANY"
+    Case NRC_BRIDGE:      s = "BRIDGE"
+    Case NRC_CANOCCR:     s = "CANOCCR"
+'25
+    Case NRC_CANCEL:      s = "CANCEL"
+'27, 28, 29
+    Case NRC_DUPENV:      s = "DUPENV"
+'31, 32, 33
+    Case NRC_ENVNOTDEF:   s = "ENVNOTDEF"
+    Case NRC_OSRESNOTAV:  s = "OSRESNOTAV"
+    Case NRC_MAXAPPS:     s = "MAXAPPS"
+    Case NRC_NOSAPS:      s = "NOSAPS"
+    Case NRC_NORESOURCES: s = "NORESOURCES"
+    Case NRC_INVADDRESS:  s = "INVADDRESS"
+    Case NRC_INVDDID:     s = "INVDDID"
+    Case NRC_LOCKFAIL:    s = "LOCKFAIL"
+    Case NRC_OPENERR:     s = "OPENERR"
+    Case NRC_SYSTEM:      s = "SYSTEM"
+    Case NRC_PENDING:     s = "PENDING"
+    End Select
+    ReturnToStr = s
 End Function

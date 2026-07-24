@@ -43,12 +43,46 @@ Friend Sub New_(ByVal b1 As Byte, ByVal b2 As Byte, ByVal b3 As Byte, ByVal b4 A
     m_sep = sep
 End Sub
 
-Friend Sub NewC(other As MACAddress)
+Friend Sub NewS(s As String)
+    Parse s
+End Sub
+
+Friend Sub NewC(other As MACADDress)
     With other: Me.New_ .Value1, .Value2, .Value3, .Value4, .Value5, .Value6: End With
 End Sub
 
-Friend Function Clone() As MACAddress
-    Set Clone = New MACAddress: Clone.NewC Me
+Public Function Parse(s As String) As Boolean
+Try: On Error GoTo Catch
+    Dim sa() As String
+    If Not TryOneOfSeparators(s, "-:", sa) Then Exit Function
+    Dim i As Long
+    
+    Parse = True
+    Exit Function
+Catch:
+End Function
+
+Private Function TrySeparator(ByVal Value As String, sep As String, sa_out() As String) As Boolean
+Try: On Error GoTo Catch
+    sa_out = Split(Value, sep)
+    TrySeparator = 0 < UBound(sa_out)
+Catch:
+End Function
+
+Private Function TryOneOfSeparators(ByVal Value As String, multiseps As String, sa_out() As String) As Boolean
+    Dim i As Long, sep As String
+    For i = 1 To Len(multiseps)
+        sep = Mid(multiseps, i, 1)
+        If TrySeparator(Value, sep, sa_out) Then
+            TryOneOfSeparators = True
+            Exit Function
+        End If
+    Next
+End Function
+
+
+Friend Function Clone() As MACADDress
+    Set Clone = New MACADDress: Clone.NewC Me
 End Function
 
 Friend Property Get Ptr() As LongPtr

@@ -19,6 +19,14 @@ Begin VB.Form FMain
    ScaleHeight     =   7830
    ScaleWidth      =   10095
    StartUpPosition =   3  'Windows-Standard
+   Begin VB.CommandButton Command1 
+      Caption         =   "Command1"
+      Height          =   375
+      Left            =   6480
+      TabIndex        =   9
+      Top             =   1080
+      Width           =   1695
+   End
    Begin VB.TextBox TBTests 
       BeginProperty Font 
          Name            =   "Consolas"
@@ -126,6 +134,14 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
+
+Private Sub Command1_Click()
+    Dim nla As Long: nla = MNetBios.EnumLanAdapter
+    MsgBox nla
+    Dim ma As String
+    ma = MNetBios.GetMACAddress(1)
+    MsgBox ma
+End Sub
 
 Private Sub Form_Load()
     Me.Caption = Me.Caption & " v" & App.Major & "." & App.Minor & "." & App.Revision

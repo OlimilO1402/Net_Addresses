@@ -32,11 +32,19 @@ Public Function IPAddressV6Rnd() As IPAddress
     Set IPAddressV6Rnd = New IPAddress: IPAddressV6Rnd.NewV6 RndUInt16, RndUInt16, RndUInt16, RndUInt16, RndUInt16, RndUInt16, RndUInt16, RndUInt16
 End Function
 
-Public Function MACAddress(ByVal b1 As Byte, ByVal b2 As Byte, ByVal b3 As Byte, ByVal b4 As Byte, ByVal b5 As Byte, ByVal b6 As Byte, Optional sep As String = "-") As MACAddress
-    Set MACAddress = New MACAddress: MACAddress.New_ b1, b2, b3, b4, b5, b6, sep
+Public Function MACADDress(ByVal b1 As Byte, ByVal b2 As Byte, ByVal b3 As Byte, ByVal b4 As Byte, ByVal b5 As Byte, ByVal b6 As Byte, Optional sep As String = "-") As MACADDress
+    Set MACADDress = New MACADDress: MACADDress.New_ b1, b2, b3, b4, b5, b6, sep
 End Function
 
-Public Function MACAddressA(bytes05() As Byte, Optional sep As String = "-") As MACAddress
-    Set MACAddressA = New MACAddress: MACAddressA.New_ bytes05(0), bytes05(1), bytes05(2), bytes05(3), bytes05(4), bytes05(5), sep
+Public Function MACAddressA(bytes05() As Byte, Optional sep As String = "-") As MACADDress
+    Set MACAddressA = New MACADDress: MACAddressA.New_ bytes05(0), bytes05(1), bytes05(2), bytes05(3), bytes05(4), bytes05(5), sep
+End Function
+
+Public Function MACAddressS(s As String) As MACADDress
+    Set MACAddressS = New MACADDress: MACAddressS.NewS s
+End Function
+
+Public Function LANAdapter(LanNumber As Long, MACADDress As MACADDress) As LANAdapter
+    Set LANAdapter = New LANAdapter: LANAdapter.New_ LanNumber, MACADDress
 End Function
 

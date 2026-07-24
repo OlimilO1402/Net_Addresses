@@ -40,20 +40,25 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
+Private m_LANAdapters As Collection
 
 Private Sub Form_Load()
+    Set m_LANAdapters = New Collection
 Try: On Error GoTo Catch
     Dim sa() As String: sa = MWMI.MACAddresses
     Dim i As Long, s As String
+    Dim la As LANAdapter
     For i = 0 To UBound(sa)
-        List1.AddItem s
+        s = sa(i)
+        'Set la = MNew.LANAdapter(i, MNew.MACAddressA(s))
+        List1.AddItem s 'la.MACADDress.ToStr
     Next
     Exit Sub
 Catch: 'MsgBox Err.Number & " " & Err.Description
 End Sub
 
 Private Sub Command1_Click()
-    Dim mac As MACAddress
-    Set mac = MNew.MACAddress(1, 2, 3, 4, 5, 6)
+    Dim mac As MACADDress
+    Set mac = MNew.MACADDress(1, 2, 3, 4, 5, 6)
     MsgBox mac.ToStr
 End Sub

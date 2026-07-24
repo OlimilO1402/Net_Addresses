@@ -14,6 +14,9 @@ Attribute VB_Exposed = False
 Option Explicit
 'https://de.wikipedia.org/wiki/IP-Adresse
 'https://en.wikipedia.org/wiki/IP_address
+'https://de.wikipedia.org/wiki/IPv6
+'https://en.wikipedia.org/wiki/IPv6
+
 Private Type TInt
     Value As Integer
 End Type
@@ -127,11 +130,31 @@ End Function
 '    End With
 'End Function
 
+'https://de.wikipedia.org/wiki/IPv6
+'2001:0db8:85a3:08d3:1319:8a2e:0370:7344
+'2001:0db8:0000:08d3:0000:8a2e:0070:7344
+'2001:db8:0:8d3:0:8a2e:70:7344
+'2001:db8:0:0:0:0:1428:57ab
+'2001:db8::1428:57ab
+'2001:db8:0:1:1:1:1:1
+'false: 2001:db8::1:1:1:1:1
+'2001:0db8:0:0:8d3:0:0:0
+'2001:db8:0:0:8d3::
+'2001:db8::8d3:0:0:0
+'false: 2001:db8::8d3::
+'could also be: 2001:db8:0:0:0:8d3:0:0
+'::ffff:127.0.0.1
+'::ffff:7f00:1
+'URI: http://[2001:0db8:85a3:08d3::0370:7344]/
+'URI: http://[2001:0db8:85a3:08d3::0370:7344]:8080/
+'CIDR-Notation: "2001:0db8:1234::/48" = von "2001:0db8:1234:0000:0000:0000:0000:0000" bis "2001:0db8:1234:ffff:ffff:ffff:ffff:ffff"
+
+
 Public Function Parse(StrLngBytesNewAddress) As Boolean
     'StrLngBytesNewAddress: you can either give a string, or a bytearray or a long, or a currency
     'm_Name = aName
     Dim vt As VbVarType: vt = VarType(StrLngBytesNewAddress)
-    Dim va, i As Long, u As Long
+    Dim va, i As Long, u As Long, s As String
     Select Case vt
     Case vbCurrency
         Dim cc As TCur: cc.Value = CCur(StrLngBytesNewAddress) / CCur(10000): LSet m_ip = cc
@@ -157,15 +180,18 @@ Public Function Parse(StrLngBytesNewAddress) As Boolean
         If 0 < u And u <= 3 Then
             m_Version = 4
         Else
+            StrLngBytesNewAddress = ParseDD(StrLngBytesNewAddress)
             va = Split(StrLngBytesNewAddress, ":")
             u = UBound(va)
             m_Version = 6
             For i = 0 To u
-                va(i) = "&H" & va(i)
+                s = va(i)
+                If Len(s) = 0 Then s = "0"
+                va(i) = "&H" & s
             Next
         End If
     End Select
-    Dim s As String, sa() As String
+    Dim sa() As String
     If m_Version = 4 Then
         Dim ba As BArr4
         For i = 0 To u
@@ -189,11 +215,11 @@ Public Function Parse(StrLngBytesNewAddress) As Boolean
     Else
         Dim ia As IArr8
         For i = 0 To u
+            s = va(i)
             If i < u Then
-                ia.Value(i) = CInt(va(i))
+                ia.Value(i) = CInt(s)
             Else
                 'maybe the last contains a port
-                s = va(i)
                 If InStr(s, "%") = 0 Then
                     If IsNumeric(s) Then
                         ia.Value(i) = CInt(s)
@@ -207,6 +233,23 @@ Public Function Parse(StrLngBytesNewAddress) As Boolean
         Next
         LSet m_ip = ia
     End If
+End Function
+Private Function ParseDD(ByVal s As String) As String
+    Dim sa() As String:      sa = Split(s, ":")
+    Dim d As Long, u As Long: u = UBound(sa)
+    Dim sr As String, br As Boolean, bl As Boolean
+    If InStr(s, "::") Then
+        If Right(s, 2) = "::" Then br = True
+        If Left$(s, 2) = "::" Then sr = "0"
+        d = 7 - u
+        Dim i As Long
+        For i = 0 To d
+            sr = sr & ":" & "0"
+        Next
+        If Len(sr) Then sr = sr & ":" & IIf(br, "0", "")
+        s = Replace(s, "::", sr)
+    End If
+    ParseDD = s
 End Function
 
 Private Function Hex4(ByVal Value As Integer) As String
@@ -231,15 +274,15 @@ Friend Function ToStr() As String
     Else
         Dim ii As TInt
         LSet ii = m_ip.Value1_b12
-        sa(i) = Hex4(ii.Value):    i = i + 1
+        sa(i) = LCase(Hex4(ii.Value)):    i = i + 1
         LSet ii = m_ip.Value2_b34
-        sa(i) = Hex4(ii.Value):    i = i + 1
-        sa(i) = Hex4(m_ip.Value3): i = i + 1
-        sa(i) = Hex4(m_ip.Value4): i = i + 1
-        sa(i) = Hex4(m_ip.Value5): i = i + 1
-        sa(i) = Hex4(m_ip.Value6): i = i + 1
-        sa(i) = Hex4(m_ip.Value7): i = i + 1
-        sa(i) = Hex4(m_ip.Value8) ': i = i + 1
+        sa(i) = LCase(Hex4(ii.Value)):    i = i + 1
+        sa(i) = LCase(Hex4(m_ip.Value3)): i = i + 1
+        sa(i) = LCase(Hex4(m_ip.Value4)): i = i + 1
+        sa(i) = LCase(Hex4(m_ip.Value5)): i = i + 1
+        sa(i) = LCase(Hex4(m_ip.Value6)): i = i + 1
+        sa(i) = LCase(Hex4(m_ip.Value7)): i = i + 1
+        sa(i) = LCase(Hex4(m_ip.Value8)) ': i = i + 1
     End If
 '    Set p = IIf(m_Version = 4, ".", ":")
 '    With m_ip

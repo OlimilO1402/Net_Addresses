@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "NetAdapter"
+Attribute VB_Name = "LANAdapter"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private Type ADAPTER_STATUS
-    adapter_address(0 To 5) As Byte 'MAC-Adress
+    adapter_address(0 To 5) As Byte 'MAC-Address
     rev_major          As Byte
     reserved0          As Byte
     adapter_type       As Byte
@@ -55,7 +55,16 @@ Private Type ASTAT
 End Type
 
 Private m_AdapterStatus As ASTAT
-Private m_MACAddress    As MACAddress
+Private m_MACAddress    As MACADDress
+Private m_Number        As Long
+
+Friend Sub New_(LanNumber As Long, MACADDress As MACADDress)
+    m_Number = LanNumber:    Set m_MACAddress = MACADDress
+End Sub
+
+Public Property Get Number() As Long
+    Number = m_Number
+End Property
 
 Public Property Get Ptr() As LongPtr
     Ptr = VarPtr(m_AdapterStatus)
@@ -65,6 +74,10 @@ Public Property Get Name() As String
     Name = StrConv(m_AdapterStatus.NameBuff(0).NName, vbNarrow)
 End Property
 
+Public Property Get MACADDress() As MACADDress
+    Set MACADDress = m_MACAddress
+End Property
+
 Public Sub Reset()
-    
+    '
 End Sub

@@ -1,13 +1,13 @@
 Type=Exe
 Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#C:\Windows\SysWOW64\stdole2.tlb#OLE Automation
-Form=Forms\Form1.frm
+Form=Forms\FMain.frm
+Form=Forms\FMACAddr.frm
 Module=MNew; Modules\MNew.bas
-Class=IPAddress; Classes\IPAddress.cls
-Class=MACAddress; Classes\MACAddress.cls
-Form=Forms\Form2.frm
 Module=MWMI; Modules\Module1.bas
 Module=MPtr; ..\Ptr_Pointers\Modules\MPtr.bas
 Module=MNetBios; Modules\MNetBios.bas
+Class=IPAddress; Classes\IPAddress.cls
+Class=MACAddress; Classes\MACAddress.cls
 Class=LANAdapter; Classes\NetAdapter.cls
 ResFile32="Resources\MyRes.res"
 IconForm="FMain"

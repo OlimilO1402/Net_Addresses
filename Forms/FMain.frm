@@ -4,7 +4,7 @@ Begin VB.Form FMain
    ClientHeight    =   7830
    ClientLeft      =   120
    ClientTop       =   465
-   ClientWidth     =   10095
+   ClientWidth     =   11055
    BeginProperty Font 
       Name            =   "Segoe UI"
       Size            =   9.75
@@ -14,16 +14,16 @@ Begin VB.Form FMain
       Italic          =   0   'False
       Strikethrough   =   0   'False
    EndProperty
-   Icon            =   "Form1.frx":0000
-   LinkTopic       =   "Form1"
+   Icon            =   "FMain.frx":0000
+   LinkTopic       =   "FMain"
    ScaleHeight     =   7830
-   ScaleWidth      =   10095
+   ScaleWidth      =   11055
    StartUpPosition =   3  'Windows-Standard
-   Begin VB.CommandButton Command1 
-      Caption         =   "Command1"
+   Begin VB.CommandButton Command2 
+      Caption         =   "Command2"
       Height          =   375
-      Left            =   6480
-      TabIndex        =   9
+      Left            =   7440
+      TabIndex        =   14
       Top             =   1080
       Width           =   1695
    End
@@ -41,7 +41,7 @@ Begin VB.Form FMain
       Left            =   0
       MultiLine       =   -1  'True
       ScrollBars      =   3  'Beides
-      TabIndex        =   5
+      TabIndex        =   3
       Top             =   1560
       Width           =   9735
    End
@@ -49,68 +49,51 @@ Begin VB.Form FMain
       Caption         =   "Do Some Tests"
       Height          =   375
       Left            =   120
-      TabIndex        =   4
+      TabIndex        =   2
       Top             =   1200
       Width           =   2295
    End
-   Begin VB.CommandButton BtnCreateIPAddressV6 
-      Caption         =   "Create IP-AddressV6"
+   Begin VB.CommandButton Command1 
+      Caption         =   "Command1"
       Height          =   375
-      Left            =   5160
-      TabIndex        =   3
-      Top             =   720
-      Width           =   3015
-   End
-   Begin VB.TextBox TxtIPV6 
-      BeginProperty Font 
-         Name            =   "Consolas"
-         Size            =   9.75
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      Height          =   375
-      Left            =   120
-      TabIndex        =   2
-      Text            =   "ABCD:EF01:2345:6789:ABCD:EF01:2345:6789"
-      Top             =   720
-      Width           =   5055
+      Left            =   5520
+      TabIndex        =   7
+      Top             =   1080
+      Width           =   1695
    End
    Begin VB.CommandButton BtnTestMACAddress 
       Caption         =   "MAC-Addr >>"
       Height          =   375
-      Left            =   8160
-      TabIndex        =   8
-      Top             =   120
+      Left            =   9120
+      TabIndex        =   6
+      Top             =   240
       Width           =   1815
    End
    Begin VB.CommandButton BtnIPV4AddRnd 
-      Caption         =   "IP-V4 Add Rnd"
+      Caption         =   "IPv4 Add Rnd"
       Height          =   375
-      Left            =   6480
-      TabIndex        =   7
-      Top             =   120
-      Width           =   1695
+      Left            =   7440
+      TabIndex        =   5
+      Top             =   480
+      Width           =   1575
+   End
+   Begin VB.CommandButton BtnCreateIPAddr 
+      Caption         =   "Create IP-Address"
+      Height          =   375
+      Left            =   5520
+      TabIndex        =   1
+      Top             =   480
+      Width           =   1935
    End
    Begin VB.CommandButton BtnIPV4Add1 
-      Caption         =   "IP-V4 Add 1"
+      Caption         =   "IPv4 Add 1"
       Height          =   375
-      Left            =   5160
-      TabIndex        =   6
+      Left            =   7440
+      TabIndex        =   4
       Top             =   120
-      Width           =   1335
+      Width           =   1575
    End
-   Begin VB.CommandButton BtnCreateIPAddressV4 
-      Caption         =   "Create IP-AddressV4"
-      Height          =   375
-      Left            =   2520
-      TabIndex        =   1
-      Top             =   120
-      Width           =   2655
-   End
-   Begin VB.TextBox TxtIPV4 
+   Begin VB.TextBox TxtIP 
       BeginProperty Font 
          Name            =   "Consolas"
          Size            =   9.75
@@ -121,11 +104,58 @@ Begin VB.Form FMain
          Strikethrough   =   0   'False
       EndProperty
       Height          =   375
-      Left            =   120
+      Left            =   0
       TabIndex        =   0
-      Text            =   "192.168.178.100"
+      Top             =   480
+      Width           =   5535
+   End
+   Begin VB.CommandButton BtnBspIPv6nZoneID 
+      Caption         =   "IPv6+zoneID"
+      Height          =   375
+      Left            =   4080
+      TabIndex        =   13
       Top             =   120
-      Width           =   2415
+      Width           =   1335
+   End
+   Begin VB.CommandButton BtnBspIPv6nPort 
+      Caption         =   "IPv6+Port"
+      Height          =   375
+      Left            =   3000
+      TabIndex        =   11
+      Top             =   120
+      Width           =   1095
+   End
+   Begin VB.CommandButton BtnBspIPv6incl4 
+      Caption         =   "IPv6incl4"
+      Height          =   375
+      Left            =   2040
+      TabIndex        =   12
+      Top             =   120
+      Width           =   975
+   End
+   Begin VB.CommandButton BtnBspIPv6 
+      Caption         =   "IPv6"
+      Height          =   375
+      Left            =   1440
+      TabIndex        =   9
+      Top             =   120
+      Width           =   615
+   End
+   Begin VB.CommandButton BtnBspIPv4 
+      Caption         =   "IPv4"
+      Height          =   375
+      Left            =   840
+      TabIndex        =   8
+      Top             =   120
+      Width           =   615
+   End
+   Begin VB.Label Label1 
+      Caption         =   "Bsps:"
+      Height          =   375
+      Left            =   120
+      TabIndex        =   10
+      Top             =   120
+      Width           =   615
    End
 End
 Attribute VB_Name = "FMain"
@@ -135,16 +165,20 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 
-Private Sub Command1_Click()
-    Dim nla As Long: nla = MNetBios.EnumLanAdapter
-    MsgBox nla
-    Dim ma As String
-    ma = MNetBios.GetMACAddress(1)
-    MsgBox ma
+
+Private Sub Command2_Click()
+    TxtIP.Text = "2001:0db8:85a3:08d3:1319:8a2e:0370:7347"
+    Dim ip As IPAddress: Set ip = MNew.IPAddressV(TxtIP.Text)
+    DebugWriteLine ip.ToStr
+    DebugWriteLine ip.ProviderRIRNet
+    DebugWriteLine ip.EnduserNet
+    DebugWriteLine ip.ProviderPrefix
+    DebugWriteLine ip.InterfaceID
 End Sub
 
 Private Sub Form_Load()
     Me.Caption = Me.Caption & " v" & App.Major & "." & App.Minor & "." & App.Revision
+    BtnBspIPv4_Click
 End Sub
 
 Private Sub Form_Resize()
@@ -155,36 +189,41 @@ Private Sub Form_Resize()
     If W > 0 And H > 0 Then TBTests.Move L, t, W, H
 End Sub
 
-Private Sub BtnCreateIPAddressV4_Click()
+Private Sub BtnBspIPv4_Click():        TxtIP.Text = "192.168.178.100":                         End Sub
+Private Sub BtnBspIPv6_Click():        TxtIP.Text = "2001:db8:0:8d3:0:8a2e:70:7344":           End Sub
+Private Sub BtnBspIPv6incl4_Click():   TxtIP.Text = "::ffff:127.0.0.1":                        End Sub
+Private Sub BtnBspIPv6nPort_Click():   TxtIP.Text = "[::]:653061":                             End Sub
+Private Sub BtnBspIPv6nZoneID_Click(): TxtIP.Text = "fe80::7645:6de2:ff:1%eth0":               End Sub
+
+Private Sub BtnCreateIPAddr_Click()
     
-    Dim ip As IPAddress: Set ip = MNew.IPAddressV(TxtIPV4.Text)
+    Dim ip As IPAddress: Set ip = MNew.IPAddressV(TxtIP.Text)
     DebugWriteLine ip.ToStr
-    
+
 End Sub
 
+'Private Sub BtnCreateIPAddressV4_Click()
+'End Sub
+'Private Sub BtnCreateIPAddressV6_Click()
+'End Sub
+
 Private Sub BtnIPV4Add1_Click()
-    Dim ip As IPAddress: Set ip = MNew.IPAddressV(TxtIPV4.Text)
+    Dim ip As IPAddress: Set ip = MNew.IPAddressV(TxtIP.Text)
     ip.OneUp
-    TxtIPV4.Text = ip.ToStr
+    TxtIP.Text = ip.ToStr
     DebugWriteLine ip.ToStr
 End Sub
 
 Private Sub BtnIPV4AddRnd_Click()
-    Dim ip As IPAddress: Set ip = MNew.IPAddressV(TxtIPV4.Text)
+    Dim ip As IPAddress: Set ip = MNew.IPAddressV(TxtIP.Text)
     Dim s As String: s = ip.ToStr
     Randomize
     Dim b As Byte: b = Rnd * 255
     ip.Add b
-    TxtIPV4.Text = ip.ToStr
+    TxtIP.Text = ip.ToStr
     DebugWriteLine s & " + " & b & " = " & ip.ToStr
 End Sub
 
-Private Sub BtnCreateIPAddressV6_Click()
-    
-    Dim ip As IPAddress: Set ip = MNew.IPAddressV(TxtIPV6.Text)
-    DebugWriteLine ip.ToStr
-    
-End Sub
 
 Private Sub BtnDoSomeTests_Click()
     
@@ -263,6 +302,14 @@ Private Sub BtnDoSomeTests_Click()
         DebugWriteLine "IP-V4: " & ip.ToStr & " > " & ip2.ToStr
     End If
     
+End Sub
+
+Private Sub Command1_Click()
+    Dim nla As Long: nla = MNetBios.EnumLanAdapter
+    MsgBox nla
+    Dim ma As String
+    ma = MNetBios.GetMACAddress(1)
+    MsgBox ma
 End Sub
 
 Sub DebugWriteLine(s As String)
